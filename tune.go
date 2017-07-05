@@ -144,12 +144,30 @@ func TunefindMovie(relUrl string) {
 	}
 }
 
+func TunefindTvEpisodeSongs(relUrl string) {
+	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
+
+	goquerySelector := "div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a"
+	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
+		fmt.Println(result.RelUrl)
+	}
+}
+
+func TunefindTvEpisodes(relUrl string) {
+	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
+
+	goquerySelector := "div.Tunefind__Content li.MainList__item___fZ13_ h3.EpisodeListItem__title___32XUR a"
+	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
+		TunefindTvEpisodeSongs(result.RelUrl)
+	}
+}
+
 func TunefindTv(relUrl string) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 
 	goquerySelector := "div.Tunefind__Content ul[aria-labelledby='season-dropdown'] a[role='menuitem']"
 	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
-		fmt.Println(result.RelUrl)
+		TunefindTvEpisodes(result.RelUrl)
 	}
 }
 
