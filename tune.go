@@ -17,6 +17,10 @@ var (
 	tunefindBaseUrl = "https://www.tunefind.com"
 )
 
+type GoqueryResults struct {
+	Results []string
+}
+
 type TunefindSong struct {
 	Title             string
 	RelUrl            string
@@ -100,8 +104,8 @@ func Goquery(url string, goquerySelector string) (domNode *goquery.Selection) {
 	return
 }
 
-func (results *TunefindSearchResults) GoqueryAttrsFrom(domNodes *goquery.Selection, attr string) {
-	results.Results = make([]TunefindSearcResult, domNodes.Size())
+func (results *GoqueryResults) GoqueryAttrsFrom(domNodes *goquery.Selection, attr string) {
+	results.Results = make([]string, domNodes.Size())
 	domNodes.Each(func(i int, s *goquery.Selection) {
 		var attrValue string
 		var attrPresent bool
@@ -116,22 +120,22 @@ func (results *TunefindSearchResults) GoqueryAttrsFrom(domNodes *goquery.Selecti
 			log.Printf("[warn] %s\n", s_html)
 		}
 
-		results.Results[i] = TunefindSearcResult{RelUrl: attrValue}
+		results.Results[i] = attrValue
 	})
 	return
 }
 
-func GoqueryHrefsFrom(url string, goquerySelector string) (results TunefindSearchResults) {
+func GoqueryHrefsFrom(url string, goquerySelector string) (results GoqueryResults) {
 	results.GoqueryAttrsFrom(Goquery(url, goquerySelector), "href")
 	return
 }
 
-func GoqueryTextFrom(url string, goquerySelector string) (results TunefindSearchResults) {
+func GoqueryTextFrom(url string, goquerySelector string) (results GoqueryResults) {
 	results.GoqueryAttrsFrom(Goquery(url, goquerySelector), "text")
 	return
 }
 
-func GoqueryHrefsFromParents(url string, selectors []string) (results TunefindSearchResults) {
+func GoqueryHrefsFromParents(url string, selectors []string) (results GoqueryResults) {
 	var domNodes *goquery.Selection
 	last_idx := len(selectors) - 1
 	for idx, selector := range selectors {
@@ -147,10 +151,19 @@ func GoqueryHrefsFromParents(url string, selectors []string) (results TunefindSe
 	return
 }
 
+func (results *TunefindSearchResults) GoqueryResultsToTunefindSearchResults(goqueryResults GoqueryResults) {
+	results.Results = make([]TunefindSearcResult, len(goqueryResults.Results))
+	for idx, goqueryResult := range goqueryResults.Results {
+		results.Results[idx] = TunefindSearcResult{RelUrl: goqueryResult}
+	}
+}
+
 func TunefindSearch(searchQuery string, searchType string) {
 	fullUrl := TunefindUrlFor("search", searchQuery)
 	goquerySelector := "div.row.tf-search-results a"
-	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
+	var tunefindSearchResults TunefindSearchResults
+	tunefindSearchResults.GoqueryResultsToTunefindSearchResults(GoqueryHrefsFrom(fullUrl, goquerySelector))
+	for _, result := range tunefindSearchResults.Results {
 		if searchType != result.LinkType() && searchType != "all" {
 			continue
 		}
@@ -171,18 +184,11 @@ func TunefindMovie(relUrl string) {
 
 	goquerySelector := "div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a"
 	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
-		fmt.Println(result.RelUrl)
+		fmt.Println(result)
 	}
 }
 
-func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
-	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, listPageUrl)
-
-	goquerySelector := fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl)
-	for _, result := range GoqueryTextFrom(fullUrl, goquerySelector).Results {
-		song.Title = result.RelUrl
-	}
-
+func (song *TunefindSong) TunefindSongsDetailsArtist(fullUrl string) {
 	artistSelector := []string{
 		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
 		"..",
@@ -191,9 +197,11 @@ func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 		"a.Tunefind__Artist",
 	}
 	for _, result := range GoqueryHrefsFromParents(fullUrl, artistSelector).Results {
-		song.Artist = result.RelUrl
+		song.Artist = result
 	}
+}
 
+func (song *TunefindSong) TunefindSongsDetailsArtistLink(fullUrl string) {
 	artistUrlSelector := []string{
 		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
 		"..",
@@ -202,9 +210,11 @@ func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 		"a.Tunefind__Artist",
 	}
 	for _, result := range GoqueryHrefsFromParents(fullUrl, artistUrlSelector).Results {
-		song.ArtistUrl = result.RelUrl
+		song.ArtistUrl = result
 	}
+}
 
+func (song *TunefindSong) TunefindSongsDetailsYoutube(fullUrl string) {
 	youtubeUrlSelector := []string{
 		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
 		"..",
@@ -214,8 +224,21 @@ func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 		"a.StoreLinks__youtube___2MHoI",
 	}
 	for _, result := range GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector).Results {
-		song.YoutubeForwardUrl = result.RelUrl
+		song.YoutubeForwardUrl = result
 	}
+}
+
+func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
+	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, listPageUrl)
+
+	goquerySelector := fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl)
+	for _, result := range GoqueryTextFrom(fullUrl, goquerySelector).Results {
+		song.Title = result
+	}
+
+	song.TunefindSongsDetailsArtist(fullUrl)
+	song.TunefindSongsDetailsArtistLink(fullUrl)
+	song.TunefindSongsDetailsYoutube(fullUrl)
 }
 
 func TunefindTvEpisodeSongs(relUrl string) {
@@ -223,8 +246,8 @@ func TunefindTvEpisodeSongs(relUrl string) {
 
 	goquerySelector := "div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a"
 	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
-		fmt.Println(result.RelUrl)
-		song := TunefindSong{RelUrl: result.RelUrl}
+		fmt.Println(result)
+		song := TunefindSong{RelUrl: result}
 		song.TunefindSongsDetails(relUrl)
 		fmt.Println(song)
 	}
@@ -235,7 +258,7 @@ func TunefindTvEpisodes(relUrl string) {
 
 	goquerySelector := "div.Tunefind__Content li.MainList__item___fZ13_ h3.EpisodeListItem__title___32XUR a"
 	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
-		TunefindTvEpisodeSongs(result.RelUrl)
+		TunefindTvEpisodeSongs(result)
 	}
 }
 
@@ -244,7 +267,7 @@ func TunefindTv(relUrl string) {
 
 	goquerySelector := "div.Tunefind__Content ul[aria-labelledby='season-dropdown'] a[role='menuitem']"
 	for _, result := range GoqueryHrefsFrom(fullUrl, goquerySelector).Results {
-		TunefindTvEpisodes(result.RelUrl)
+		TunefindTvEpisodes(result)
 	}
 }
 
@@ -253,7 +276,7 @@ func TunefindArtist(relUrl string) {
 
 	goquerySelector := "div.Tunefind__Content div.AppearanceRow__songInfoTitleBlock___3woDL div.AppearanceRow__songInfoTitle___38aKt"
 	for _, result := range GoqueryTextFrom(fullUrl, goquerySelector).Results {
-		fmt.Println(result.RelUrl)
+		fmt.Println(result)
 	}
 }
 
