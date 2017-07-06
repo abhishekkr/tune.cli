@@ -8,6 +8,8 @@ import (
 
 	"github.com/abhishekkr/gol/golgoquery"
 	"github.com/abhishekkr/gol/golhttpclient"
+
+	youtubecom "github.com/abhishekkr/tune.cli/youtubecom"
 )
 
 var (
@@ -263,7 +265,7 @@ func ShowTunefindSongs(songsMap map[string][]TunefindSong) {
 			fmt.Printf("[*] %s\n", song.Title)
 			fmt.Printf("    [url](%s%s)\n", tunefindBaseUrl, song.RelUrl)
 			fmt.Printf("    by [%s](%s%s)\n", song.Artist, tunefindBaseUrl, song.ArtistUrl)
-			fmt.Printf("    listen at [youtube](%s)\n", song.YoutubeUrl)
+			fmt.Printf("    listen at [youtube](%s)\n", youtubecom.FirstLink(song.YoutubeUrl))
 		}
 	}
 }
