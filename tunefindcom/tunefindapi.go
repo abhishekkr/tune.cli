@@ -20,11 +20,11 @@ type TunefindFilter struct {
 }
 
 type TunefindSong struct {
-	Title             string
-	RelUrl            string
-	Artist            string
-	ArtistUrl         string
-	YoutubeForwardUrl string
+	Title      string
+	RelUrl     string
+	Artist     string
+	ArtistUrl  string
+	YoutubeUrl string
 }
 
 type TunefindSearcResult struct {
@@ -119,7 +119,7 @@ func (song *TunefindSong) TunefindSongsDetailsYoutube(fullUrl string) {
 		"a.StoreLinks__youtube___2MHoI",
 	}
 	for _, result := range golgoquery.GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector).Results {
-		song.YoutubeForwardUrl = result
+		song.YoutubeUrl = golhttpclient.UrlRedirectTo(fmt.Sprintf("%s%s", tunefindBaseUrl, result))
 	}
 }
 
@@ -263,7 +263,7 @@ func ShowTunefindSongs(songsMap map[string][]TunefindSong) {
 			fmt.Printf("[*] %s\n", song.Title)
 			fmt.Printf("    [url](%s%s)\n", tunefindBaseUrl, song.RelUrl)
 			fmt.Printf("    by [%s](%s%s)\n", song.Artist, tunefindBaseUrl, song.ArtistUrl)
-			fmt.Printf("    listen at [youtube](%s%s)\n", tunefindBaseUrl, song.YoutubeForwardUrl)
+			fmt.Printf("    listen at [youtube](%s)\n", song.YoutubeUrl)
 		}
 	}
 }
