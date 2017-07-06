@@ -91,7 +91,7 @@ func (song *TunefindSong) TunefindSongsDetailsArtist(fullUrl string) {
 		"..",
 		"a.Tunefind__Artist",
 	}
-	for _, result := range golgoquery.GoqueryHrefsFromParents(fullUrl, artistSelector).Results {
+	for _, result := range golgoquery.GoqueryTextFromParents(fullUrl, artistSelector).Results {
 		song.Artist = result
 	}
 }
