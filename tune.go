@@ -21,6 +21,7 @@ type TunefindSong struct {
 	Title             string
 	RelUrl            string
 	Artist            string
+	ArtistUrl         string
 	YoutubeForwardUrl string
 }
 
@@ -29,7 +30,7 @@ type TunefindSearcResult struct {
 	Songs  []TunefindSong
 }
 
-type TunefindSearcResults struct {
+type TunefindSearchResults struct {
 	Results []TunefindSearcResult
 }
 
@@ -92,12 +93,16 @@ func GoqueryDocument(url string) *goquery.Document {
 	return doc
 }
 
-func GoqueryAttrsFrom(url string, goquerySelector string, attr string) (results TunefindSearcResults) {
+func Goquery(url string, goquerySelector string) (domNode *goquery.Selection) {
 	doc := GoqueryDocument(url)
 
-	a_nodes := doc.Find(goquerySelector)
-	results.Results = make([]TunefindSearcResult, a_nodes.Size())
-	a_nodes.Each(func(i int, s *goquery.Selection) {
+	domNode = doc.Find(goquerySelector)
+	return
+}
+
+func (results *TunefindSearchResults) GoqueryAttrsFrom(domNodes *goquery.Selection, attr string) {
+	results.Results = make([]TunefindSearcResult, domNodes.Size())
+	domNodes.Each(func(i int, s *goquery.Selection) {
 		var attrValue string
 		var attrPresent bool
 		if attr == "text" {
@@ -116,12 +121,30 @@ func GoqueryAttrsFrom(url string, goquerySelector string, attr string) (results 
 	return
 }
 
-func GoqueryHrefsFrom(url string, goquerySelector string) (results TunefindSearcResults) {
-	return GoqueryAttrsFrom(url, goquerySelector, "href")
+func GoqueryHrefsFrom(url string, goquerySelector string) (results TunefindSearchResults) {
+	results.GoqueryAttrsFrom(Goquery(url, goquerySelector), "href")
+	return
 }
 
-func GoqueryTextFrom(url string, goquerySelector string) (results TunefindSearcResults) {
-	return GoqueryAttrsFrom(url, goquerySelector, "text")
+func GoqueryTextFrom(url string, goquerySelector string) (results TunefindSearchResults) {
+	results.GoqueryAttrsFrom(Goquery(url, goquerySelector), "text")
+	return
+}
+
+func GoqueryHrefsFromParents(url string, selectors []string) (results TunefindSearchResults) {
+	var domNodes *goquery.Selection
+	last_idx := len(selectors) - 1
+	for idx, selector := range selectors {
+		if selector == ".." {
+			domNodes = domNodes.Parent()
+		} else {
+			domNodes = Goquery(url, selector)
+		}
+		if idx == last_idx {
+			results.GoqueryAttrsFrom(domNodes, "href")
+		}
+	}
+	return
 }
 
 func TunefindSearch(searchQuery string, searchType string) {
@@ -160,12 +183,39 @@ func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 		song.Title = result.RelUrl
 	}
 
-	goquerySelector = fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl)
-	doc := GoqueryDocument(fullUrl)
-	a_nodes := doc.Find(goquerySelector).Parent().Parent().Parent().Find("a.Tunefind__Artist")
-	a_nodes.Each(func(i int, s *goquery.Selection) {
-		song.Artist = s.Text()
-	})
+	artistSelector := []string{
+		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
+		"..",
+		"..",
+		"..",
+		"a.Tunefind__Artist",
+	}
+	for _, result := range GoqueryHrefsFromParents(fullUrl, artistSelector).Results {
+		song.Artist = result.RelUrl
+	}
+
+	artistUrlSelector := []string{
+		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
+		"..",
+		"..",
+		"..",
+		"a.Tunefind__Artist",
+	}
+	for _, result := range GoqueryHrefsFromParents(fullUrl, artistUrlSelector).Results {
+		song.ArtistUrl = result.RelUrl
+	}
+
+	youtubeUrlSelector := []string{
+		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
+		"..",
+		"..",
+		"..",
+		"..",
+		"a.StoreLinks__youtube___2MHoI",
+	}
+	for _, result := range GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector).Results {
+		song.YoutubeForwardUrl = result.RelUrl
+	}
 }
 
 func TunefindTvEpisodeSongs(relUrl string) {
