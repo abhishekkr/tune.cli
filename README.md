@@ -14,6 +14,9 @@ W.I.P.
 ## fetch dependencies
 ./go-tasks.sh deps
 
+## to play searched songs on confirmation
+./go-tasks.sh gorun -search sout -type movie -song 1 -out play
+
 ## search for lucifer tv show soundtracks
 ./go-tasks.sh gorun -search lucifer -type tv                                                                                                       !11843
 

@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	searchFor := flag.String("out", "list", "default:list|play|json")
 	searchFrom := flag.String("src", "tunefind", "default:tunefind")
 	searchQuery := flag.String("search", "", "Item to search. (Required)")
 	searchType := flag.String("type", "all", "default:all|movie|tv|artist")
@@ -31,8 +32,13 @@ func main() {
 			EpisodeIndex: (*episodeIndex - 1),
 			SongIndex:    (*songIndex - 1),
 		}
+
 		songs := tunefindFilter.TunefindSearch()
-		tunefindcom.ShowTunefindSongs(songs)
+		if *searchFor == "list" {
+			tunefindcom.ShowSongs(songs)
+		} else if *searchFor == "play" {
+			tunefindcom.PlaySongs(songs)
+		}
 	} else {
 		log.Fatalf("%s source isn't supported yet, try tunefind maybe.", searchFrom)
 	}

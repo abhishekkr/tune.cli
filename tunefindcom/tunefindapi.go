@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/abhishekkr/gol/golbin"
 	"github.com/abhishekkr/gol/golgoquery"
 	"github.com/abhishekkr/gol/golhttpclient"
 
@@ -258,14 +259,48 @@ func (searchFilter TunefindFilter) TunefindSearch() (songs map[string][]Tunefind
 	return
 }
 
-func ShowTunefindSongs(songsMap map[string][]TunefindSong) {
+func (song TunefindSong) FirstYoutubeLink() string {
+	return youtubecom.FirstLink(song.YoutubeUrl)
+}
+
+func ShowSongs(songsMap map[string][]TunefindSong) {
 	for relUrl, songs := range songsMap {
 		fmt.Printf("[ %s ]\n", relUrl)
 		for _, song := range songs {
-			fmt.Printf("[*] %s\n", song.Title)
+			fmt.Printf("## %s\n", song.Title)
 			fmt.Printf("    [url](%s%s)\n", tunefindBaseUrl, song.RelUrl)
 			fmt.Printf("    by [%s](%s%s)\n", song.Artist, tunefindBaseUrl, song.ArtistUrl)
-			fmt.Printf("    listen at [youtube](%s)\n", youtubecom.FirstLink(song.YoutubeUrl))
+			fmt.Printf("    listen at [youtube](%s)\n", song.FirstYoutubeLink())
+		}
+	}
+}
+
+func PlayOrNot() bool {
+	var choice string
+	fmt.Printf(" | play (y|n): ")
+	_, err := fmt.Scanf("%s", &choice)
+	if err != nil {
+		return false
+	}
+	choice = strings.ToLower(choice)
+	if choice == "y" || choice == "yes" {
+		return true
+	}
+	return false
+}
+
+func PlaySongs(songsMap map[string][]TunefindSong) {
+	for relUrl, songs := range songsMap {
+		fmt.Printf("[ %s ]\n", relUrl)
+		for _, song := range songs {
+			fmt.Printf("* %s", song.Title)
+			fmt.Printf("[by %s]", song.Artist)
+			if !PlayOrNot() {
+				continue
+			}
+			cmd := fmt.Sprintf("xdg-open %s", song.FirstYoutubeLink())
+			konsole := golbin.Console{Command: cmd}
+			konsole.Run()
 		}
 	}
 }
