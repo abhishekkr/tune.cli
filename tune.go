@@ -16,6 +16,7 @@ func main() {
 	seasonIndex := flag.Int("season", 0, "which season if it's a tv type, default:0 for all")
 	episodeIndex := flag.Int("episode", 0, "which episode if it's a tv type, default:0 for all")
 	songIndex := flag.Int("song", 0, "which song, default:0 for all")
+	refreshCache := flag.Bool("refresh", false, "reloading cache, dfault:false")
 
 	flag.Parse()
 
@@ -31,6 +32,7 @@ func main() {
 			SeasonIndex:  (*seasonIndex - 1),
 			EpisodeIndex: (*episodeIndex - 1),
 			SongIndex:    (*songIndex - 1),
+			RefreshCache: *refreshCache,
 		}
 
 		songs := tunefindFilter.TunefindSearch()

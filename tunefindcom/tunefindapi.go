@@ -20,6 +20,7 @@ var (
 type TunefindFilter struct {
 	SearchQuery, SearchType              string
 	SeasonIndex, EpisodeIndex, SongIndex int
+	RefreshCache                         bool
 }
 
 type TunefindSong struct {
@@ -94,6 +95,7 @@ func (song *TunefindSong) TunefindSongsDetailsArtist(fullUrl string) {
 		"..",
 		"a.Tunefind__Artist",
 	}
+	golgoquery.CacheGoquery = true
 	for _, result := range golgoquery.GoqueryTextFromParents(fullUrl, artistSelector).Results {
 		song.Artist = result
 	}
@@ -107,6 +109,7 @@ func (song *TunefindSong) TunefindSongsDetailsArtistLink(fullUrl string) {
 		"..",
 		"a.Tunefind__Artist",
 	}
+	golgoquery.CacheGoquery = true
 	for _, result := range golgoquery.GoqueryHrefsFromParents(fullUrl, artistUrlSelector).Results {
 		song.ArtistUrl = result
 	}
@@ -121,6 +124,7 @@ func (song *TunefindSong) TunefindSongsDetailsYoutube(fullUrl string) {
 		"..",
 		"a.StoreLinks__youtube___2MHoI",
 	}
+	golgoquery.CacheGoquery = true
 	for _, result := range golgoquery.GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector).Results {
 		song.YoutubeUrl = golhttpclient.UrlRedirectTo(fmt.Sprintf("%s%s", tunefindBaseUrl, result))
 	}
@@ -130,6 +134,7 @@ func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, listPageUrl)
 
 	goquerySelector := fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl)
+	golgoquery.CacheGoquery = true
 	for _, result := range golgoquery.GoqueryTextFrom(fullUrl, goquerySelector).Results {
 		song.Title = result
 	}
@@ -164,6 +169,7 @@ func (searchFilter TunefindFilter) SongsResults(songResults []string, relUrl str
 func (searchFilter TunefindFilter) TunefindTvEpisodeSongs(relUrl string) (songs []TunefindSong) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 	goquerySelector := "div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a"
+	golgoquery.CacheGoquery = true
 	songResults := golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector).Results
 	songs = make([]TunefindSong, len(songResults))
 
@@ -174,6 +180,7 @@ func (searchFilter TunefindFilter) TunefindTvEpisodeSongs(relUrl string) (songs 
 func (searchFilter TunefindFilter) TunefindTvEpisodes(relUrl string) (songs []TunefindSong) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 	goquerySelector := "div.Tunefind__Content li.MainList__item___fZ13_ h3.EpisodeListItem__title___32XUR a"
+	golgoquery.CacheGoquery = true
 	episodeResults := golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector).Results
 
 	if searchFilter.EpisodeIndex > len(episodeResults) {
@@ -194,8 +201,11 @@ func (searchFilter TunefindFilter) TunefindTvEpisodes(relUrl string) (songs []Tu
 }
 
 func (searchFilter TunefindFilter) TunefindTv(relUrl string) (songs []TunefindSong) {
+	golgoquery.ReloadCache = searchFilter.RefreshCache
+
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 	goquerySelector := "div.Tunefind__Content ul[aria-labelledby='season-dropdown'] a[role='menuitem']"
+	golgoquery.CacheGoquery = true
 	seasonResults := golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector).Results
 
 	if searchFilter.SeasonIndex > len(seasonResults) {
@@ -216,8 +226,11 @@ func (searchFilter TunefindFilter) TunefindTv(relUrl string) (songs []TunefindSo
 }
 
 func (searchFilter TunefindFilter) TunefindMovie(relUrl string) (songs []TunefindSong) {
+	golgoquery.ReloadCache = searchFilter.RefreshCache
+
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 	goquerySelector := "div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a"
+	golgoquery.CacheGoquery = true
 	songResults := golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector).Results
 	songs = make([]TunefindSong, len(songResults))
 
@@ -226,8 +239,11 @@ func (searchFilter TunefindFilter) TunefindMovie(relUrl string) (songs []Tunefin
 }
 
 func (searchFilter TunefindFilter) TunefindArtist(relUrl string) (songs []TunefindSong) {
+	golgoquery.ReloadCache = searchFilter.RefreshCache
+
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 	goquerySelector := "div.Tunefind__Content div.AppearanceRow__songInfoTitleBlock___3woDL div.AppearanceRow__songInfoTitle___38aKt"
+	golgoquery.CacheGoquery = true
 	songResults := golgoquery.GoqueryTextFrom(fullUrl, goquerySelector).Results
 	songs = make([]TunefindSong, len(songResults))
 
@@ -236,9 +252,12 @@ func (searchFilter TunefindFilter) TunefindArtist(relUrl string) (songs []Tunefi
 }
 
 func (searchFilter TunefindFilter) TunefindSearch() (songs map[string][]TunefindSong) {
+	golgoquery.ReloadCache = searchFilter.RefreshCache
+
 	fullUrl := TunefindUrlFor("search", searchFilter.SearchQuery)
 	goquerySelector := "div.row.tf-search-results a"
 	var tunefindSearchResults TunefindSearchResults
+	golgoquery.CacheGoquery = true
 	tunefindSearchResults.GoqueryResultsToTunefindSearchResults(golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector))
 	songs = make(map[string][]TunefindSong, len(tunefindSearchResults.Results))
 	for _, result := range tunefindSearchResults.Results {
@@ -298,9 +317,9 @@ func PlaySongs(songsMap map[string][]TunefindSong) {
 			if !PlayOrNot() {
 				continue
 			}
-			cmd := fmt.Sprintf("xdg-open %s", song.FirstYoutubeLink())
-			konsole := golbin.Console{Command: cmd}
-			konsole.Run()
+
+			cmdOutput := golbin.RunWithAssignedApp(song.FirstYoutubeLink())
+			log.Println(cmdOutput)
 		}
 	}
 }
