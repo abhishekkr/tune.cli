@@ -2,3 +2,5 @@ github.com/jroimartin/gocui
 github.com/abhishekkr/gol/golbin
 github.com/abhishekkr/gol/golgoquery
 github.com/abhishekkr/gol/golhttpclient
+github.com/abhishekkr/tune.cli/tunefindcom
+github.com/abhishekkr/tune.cli/youtubecom
