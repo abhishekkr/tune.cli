@@ -99,48 +99,28 @@ _OLD_PWD=$PWD
 cd $(dirname $0)
 
 if [[ "$1" == "deps" ]]; then
+  goenv_on_at $PWD
   go_get_pkg
 
-elif [[ "$1" == "gorun" ]]; then
+elif [[ "$1" == "run" ]]; then
+  goenv_on_at $PWD
   go run $(dirname $0)/tune.go ${@:2}
-
-elif [[ "$1" == "test" ]]; then
-  $0 build
-  echo
-  echo "~~~~~Test Pieces~~~~~"
-  go test ./...
-  echo
-  echo "~~~~~Test Features~~~~~"
-  for feature_test in `ls ./tests/go*_client.go`; do
-    echo ">> Testing: "$feature_test
-    ./bin/goshare_daemon -daemon=start -dbpath=/tmp/GOSHARE.TEST.DB
-    go run $feature_test
-    ./bin/goshare_daemon -daemon=stop
-    rm -rf /tmp/GOSHARE.TEST.DB
-  done
-
-elif [[ "$1" == "wiki" ]]; then
-  $0 bin
-  echo
-  echo "~~~~~Visit wiki at GoShare HTTP~~~~~"
-  echo "~~~~~   http://0.0.0.0:9999    ~~~~~"
-  ./bin/goshare_server
 
 elif [[ "$1" == "build" ]]; then
   bash $0 deps
-  goenv_on_at $PWD
+  GOPATH="$PWD/.goenv/site"
   mkdir -p ./bin
-  cd ./bin
-  for go_code_to_build in `ls ../zxtra/goshare_*.go`; do
-    echo "Building: "$go_code_to_build
-    go build -tags zmq_4_x $go_code_to_build
+  for GOOS in darwin linux windows; do
+    for GOARCH in 386 amd64; do
+      echo "building for $GOOS - $GOARCH"
+      go build -o ./bin/tune.cli-$GOOS-$GOARCH tune.go
+    done
   done
 
 else
   echo "Use it wisely..."
   echo "Build usable binaries: '$0 build'"
   echo "Install tall Go lib dependencies: '$0 deps'"
-  echo "Run all Tests: '$0 test'"
 
 fi
 
