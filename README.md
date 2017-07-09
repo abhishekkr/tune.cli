@@ -1,42 +1,35 @@
 ## tune.sh
 
-#### install
-
-```
-W.I.P.
-```
+download your OS specific binary from [releases](https://github.com/abhishekkr/tune.cli/releases)
 
 ---
 
 #### usage
 
 ```
-## fetch dependencies
-./go-tasks.sh deps
-
 ## to play searched songs on confirmation
-./go-tasks.sh gorun -search sout -type movie -song 1 -out play
+tune.cli-linux-amd64 -search sout -type movie -song 1 -out play
 
 ## search for lucifer tv show soundtracks
-./go-tasks.sh gorun -search lucifer -type tv                                                                                                       !11843
+tune.cli-linux-amd64 -search lucifer -type tv
 
 ## search for soundtracks for movie with 'sout' in title
-./go-tasks.sh gorun -search sout -type movie
+tune.cli-linux-amd64 -search sout -type movie
 
 ## search for soundtracks for movie with 'sout' in title, song#3
-./go-tasks.sh gorun -search sout -type movie -song 3
+tune.cli-linux-amd64 -search sout -type movie -song 3
 
 ## search for tv with lucifer in title, for season 1
-./go-tasks.sh gorun -search lucifer -type tv -season 1
+tune.cli-linux-amd64 -search lucifer -type tv -season 1
 
 ## search for tv with lucifer in title, for season 1 episode 2
-./go-tasks.sh gorun -search lucifer -type tv -season 1 -episode 2
+tune.cli-linux-amd64 -search lucifer -type tv -season 1 -episode 2
 
 ## search for tv with lucifer in title, for season 1 episode 2 song listing#4
-./go-tasks.sh gorun -search lucifer -type tv -season 1 -episode 1 -song 4
+tune.cli-linux-amd64 -search lucifer -type tv -season 1 -episode 1 -song 4
 
 ## search for soundtracks for artist with 'eminem' in title
-./go-tasks.sh gorun -search sout -type artist
+tune.cli-linux-amd64 -search sout -type artist
 
 ```
 
@@ -56,6 +49,10 @@ W.I.P.
     listen at [youtube](https://www.tunefind.com/forward/song/20032?store=youtube&referrer=&x=osshyo&y=813e3b1hg6o8o48sgg4gc8kg48c84ow)
 
 ```
+
+---
+
+[dev wiki](./wiki.developer.md)
 
 ---
 
