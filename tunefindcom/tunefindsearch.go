@@ -1,6 +1,10 @@
 package tunecli_tunefindcom
 
-import golgoquery "github.com/abhishekkr/gol/golgoquery"
+import (
+	"strings"
+
+	golgoquery "github.com/abhishekkr/gol/golgoquery"
+)
 
 func (results *TunefindSearchResults) GoqueryResultsToTunefindSearchResults(goqueryResults golgoquery.GoqueryResults) {
 	results.Results = make([]TunefindSearcResult, len(goqueryResults.Results))
@@ -10,12 +14,15 @@ func (results *TunefindSearchResults) GoqueryResultsToTunefindSearchResults(goqu
 }
 
 func (searchFilter TunefindFilter) TunefindSearch() (songs map[string][]TunefindSong) {
+	var tunefindSearchResults TunefindSearchResults
+	goquerySelector := "div.row.tf-search-results a"
+
+	golgoquery.CacheGoquery = true
 	golgoquery.ReloadCache = searchFilter.RefreshCache
 
+	searchFilter.SearchQuery = strings.Replace(searchFilter.SearchQuery, " ", "+", -1)
 	fullUrl := TunefindUrlFor("search", searchFilter.SearchQuery)
-	goquerySelector := "div.row.tf-search-results a"
-	var tunefindSearchResults TunefindSearchResults
-	golgoquery.CacheGoquery = true
+
 	tunefindSearchResults.GoqueryResultsToTunefindSearchResults(golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector))
 	songs = make(map[string][]TunefindSong, len(tunefindSearchResults.Results))
 	for _, result := range tunefindSearchResults.Results {
