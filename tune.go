@@ -29,18 +29,14 @@ func main() {
 		tunefindFilter := tunefindcom.TunefindFilter{
 			SearchQuery:  *searchQuery,
 			SearchType:   *searchType,
+			SearchFor:    *searchFor,
 			SeasonIndex:  (*seasonIndex - 1),
 			EpisodeIndex: (*episodeIndex - 1),
 			SongIndex:    (*songIndex - 1),
 			RefreshCache: *refreshCache,
 		}
 
-		songs := tunefindFilter.TunefindSearch()
-		if *searchFor == "list" {
-			tunefindcom.ShowSongs(songs)
-		} else if *searchFor == "play" {
-			tunefindcom.PlaySongs(songs)
-		}
+		_ = tunefindFilter.TunefindSearch() //persist if flag passed to a playlist
 	} else {
 		log.Fatalf("%s source isn't supported yet, try tunefind maybe.", searchFrom)
 	}

@@ -89,6 +89,7 @@ func (searchFilter TunefindFilter) SongsResults(songResults []string, relUrl str
 	for idx, result := range songResults {
 		songs[idx] = TunefindSong{RelUrl: result}
 		songs[idx].TunefindSongsDetails(relUrl)
+		searchFilter.TunefindSongOutput(songs[idx])
 	}
 	return
 }

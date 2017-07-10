@@ -11,7 +11,7 @@ var (
 )
 
 type TunefindFilter struct {
-	SearchQuery, SearchType              string
+	SearchQuery, SearchType, SearchFor   string
 	SeasonIndex, EpisodeIndex, SongIndex int
 	RefreshCache                         bool
 }
