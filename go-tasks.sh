@@ -92,6 +92,18 @@ go_get_pkg(){
 
   unset _GO_GET_ENV GO_GET_ENV PKG_LISTS
 }
+
+build-for-all(){
+  local FOR_OS_ARCH="$1"
+  mkdir -p ./bin
+  for GOOS in darwin linux windows; do
+    for GOARCH in 386 amd64; do
+      [[ ! -z "${FOR_OS_ARCH}" && "${GOOS}-${GOARCH}" != "${FOR_OS_ARCH}" ]] && continue
+      echo "building for $GOOS - $GOARCH"
+      go build -o ./bin/tune.cli-$GOOS-$GOARCH tune.go
+    done
+  done
+}
 ##############################################################################
 
 
@@ -109,13 +121,7 @@ elif [[ "$1" == "run" ]]; then
 elif [[ "$1" == "build" ]]; then
   bash $0 deps
   GOPATH="$PWD/.goenv/site"
-  mkdir -p ./bin
-  for GOOS in darwin linux windows; do
-    for GOARCH in 386 amd64; do
-      echo "building for $GOOS - $GOARCH"
-      go build -o ./bin/tune.cli-$GOOS-$GOARCH tune.go
-    done
-  done
+  build-for-all "$2"
 
 else
   echo "Use it wisely..."
