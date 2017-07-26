@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	golgoquery "github.com/abhishekkr/gol/golgoquery"
 	golhttpclient "github.com/abhishekkr/gol/golhttpclient"
 
 	youtubecom "github.com/abhishekkr/tune.cli/youtubecom"
@@ -22,8 +21,8 @@ func (song *TunefindSong) TunefindSongsDetailsArtist(fullUrl string) {
 		"..",
 		"a.Tunefind__Artist",
 	}
-	golgoquery.CacheGoquery = true
-	for _, result := range golgoquery.GoqueryTextFromParents(fullUrl, artistSelector).Results {
+
+	for _, result := range GoqueryTextFromParents(fullUrl, artistSelector) {
 		song.Artist = result
 	}
 }
@@ -36,8 +35,8 @@ func (song *TunefindSong) TunefindSongsDetailsArtistLink(fullUrl string) {
 		"..",
 		"a.Tunefind__Artist",
 	}
-	golgoquery.CacheGoquery = true
-	for _, result := range golgoquery.GoqueryHrefsFromParents(fullUrl, artistUrlSelector).Results {
+
+	for _, result := range GoqueryHrefsFromParents(fullUrl, artistUrlSelector) {
 		song.ArtistUrl = result
 	}
 }
@@ -51,8 +50,8 @@ func (song *TunefindSong) TunefindSongsDetailsYoutube(fullUrl string) {
 		"..",
 		"a.StoreLinks__youtube___2MHoI",
 	}
-	golgoquery.CacheGoquery = true
-	for _, result := range golgoquery.GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector).Results {
+
+	for _, result := range GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector) {
 		song.YoutubeUrl = golhttpclient.UrlRedirectTo(fmt.Sprintf("%s%s", tunefindBaseUrl, result))
 	}
 }
@@ -61,8 +60,8 @@ func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, listPageUrl)
 
 	goquerySelector := fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl)
-	golgoquery.CacheGoquery = true
-	for _, result := range golgoquery.GoqueryTextFrom(fullUrl, goquerySelector).Results {
+
+	for _, result := range GoqueryTextFrom(fullUrl, goquerySelector) {
 		song.Title = result
 	}
 

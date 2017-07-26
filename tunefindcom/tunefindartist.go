@@ -17,8 +17,8 @@ func (searchFilter TunefindFilter) TunefindArtist(relUrl string) (songs []Tunefi
 
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
 	goquerySelector := "div.Tunefind__Content div.AppearanceRow__songInfoTitleBlock___3woDL div.AppearanceRow__songInfoTitle___38aKt"
-	golgoquery.CacheGoquery = true
-	songResults := golgoquery.GoqueryTextFrom(fullUrl, goquerySelector).Results
+
+	songResults := GoqueryTextFrom(fullUrl, goquerySelector)
 	songs = make([]TunefindSong, len(songResults))
 
 	songs = searchFilter.SongsResults(songResults, relUrl)
