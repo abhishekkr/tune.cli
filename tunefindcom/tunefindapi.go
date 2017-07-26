@@ -91,7 +91,7 @@ func GoqueryHrefsFrom(url string, selector string) []string {
 
 func GoqueryTextFrom(url string, selector string) []string {
 	golgoquery.CacheGoquery = true
-	results, err := golgoquery.GoqueryHrefsFrom(url, selector)
+	results, err := golgoquery.GoqueryTextFrom(url, selector)
 	if err != nil {
 		log.Println("[error] fetching some attributes for", url)
 	}

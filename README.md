@@ -9,17 +9,24 @@ download your OS specific binary from [releases](https://github.com/abhishekkr/t
 * sample run
 
 ```
-± % ./go-tasks.sh gorun -search south -type movie -song 1                                                                                              !11957
-[ /movie/southpaw-2015 ]
-[*] Beast (feat. Busta Rhymes, KXNG Crooked & Tech N9ne)
-    [url](https://www.tunefind.com/song/85250/108074/)
-    by [Eminem](https://www.tunefind.com/artist/eminem)
-    listen at [youtube](https://www.tunefind.com/forward/song/85256?store=youtube&referrer=&x=osshgm&y=hyz50jpazt44sw4kc0kg0gs40s4gw4)
-[ /movie/southside-with-you-2016 ]
-[*] Start
-    [url](https://www.tunefind.com/song/106149/136815/)
-    by [Raphael Saadiq](https://www.tunefind.com/artist/raphael-saadiq)
-    listen at [youtube](https://www.tunefind.com/forward/song/20032?store=youtube&referrer=&x=osshyo&y=813e3b1hg6o8o48sgg4gc8kg48c84ow)
+$ tune.cli-linux-amd64 -search dunkirk -out play
+
+* Supermarine (From Dunkirk: Original Motion Picture Soundtrack) [by Hans Zimmer] | play (y|n): 1
+* The Mole [by Hans Zimmer] | play (y|n): y
+2017/07/27 04:16:55 [info] fetching  https://www.youtube.com/results?search_query=Hans+Zimmer+The+Mole
+2017/07/27 04:16:57 Created new window in existing browser session.
+
+* We Need Our Army Back [by Hans Zimmer] | play (y|n): n
+* Shivering Soldier [by Hans Zimmer] | play (y|n): n
+* Supermarine [by Hans Zimmer] | play (y|n): n
+* The Tide [by Hans Zimmer] | play (y|n): n
+* Regimental Brothers [by Hans Zimmer & Lorne Balfe] | play (y|n): n
+* Impulse [by Hans Zimmer] | play (y|n): n
+* Home [by Hans Zimmer & Benjamin Wallfisch] | play (y|n): n
+* The Oil [by Hans Zimmer] | play (y|n): n
+* Variation 15 (Dunkirk) [by Benjamin Wallfisch & Sir Edward Elgar] | play (y|n): n
+* End Titles (Dunkirk) [by Benjamin Wallfisch, Sir Edward Elgar, Lorne Balfe & Hans Zimmer] | play (y|n): n
+
 
 ```
 
