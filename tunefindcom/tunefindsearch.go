@@ -6,10 +6,10 @@ import (
 	golgoquery "github.com/abhishekkr/gol/golgoquery"
 )
 
-func (results *TunefindSearchResults) GoqueryResultsToTunefindSearchResults(goqueryResults golgoquery.GoqueryResults) {
-	results.Results = make([]TunefindSearcResult, len(goqueryResults.Results))
-	for idx, goqueryResult := range goqueryResults.Results {
-		results.Results[idx] = TunefindSearcResult{RelUrl: goqueryResult}
+func (results *TunefindSearchResults) GoqueryResultsToTunefindSearchResults(searchResults []string) {
+	results.Results = make([]TunefindSearcResult, len(searchResults))
+	for idx, searchResult := range searchResults {
+		results.Results[idx] = TunefindSearcResult{RelUrl: searchResult}
 	}
 }
 
@@ -17,13 +17,14 @@ func (searchFilter TunefindFilter) TunefindSearch() (songs map[string][]Tunefind
 	var tunefindSearchResults TunefindSearchResults
 	goquerySelector := "div.row.tf-search-results a"
 
-	golgoquery.CacheGoquery = true
 	golgoquery.ReloadCache = searchFilter.RefreshCache
 
 	searchFilter.SearchQuery = strings.Replace(searchFilter.SearchQuery, " ", "+", -1)
 	fullUrl := TunefindUrlFor("search", searchFilter.SearchQuery)
 
-	tunefindSearchResults.GoqueryResultsToTunefindSearchResults(golgoquery.GoqueryHrefsFrom(fullUrl, goquerySelector))
+	searchResults := GoqueryHrefsFrom(fullUrl, goquerySelector)
+	tunefindSearchResults.GoqueryResultsToTunefindSearchResults(searchResults)
+
 	songs = make(map[string][]TunefindSong, len(tunefindSearchResults.Results))
 	for _, result := range tunefindSearchResults.Results {
 		if searchFilter.SearchType != result.LinkType() && searchFilter.SearchType != "all" {

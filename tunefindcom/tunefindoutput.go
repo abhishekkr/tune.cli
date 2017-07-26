@@ -40,7 +40,7 @@ func PlayOrNot() bool {
 
 func PlaySong(song TunefindSong) {
 	fmt.Printf("* %s", song.Title)
-	fmt.Printf("[by %s]", song.Artist)
+	fmt.Printf(" [by %s]", song.Artist)
 	if !PlayOrNot() {
 		return
 	}
