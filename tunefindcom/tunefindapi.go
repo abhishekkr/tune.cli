@@ -2,8 +2,11 @@ package tunecli_tunefindcom
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
+
+	golgoquery "github.com/abhishekkr/gol/golgoquery"
 )
 
 var (
@@ -17,11 +20,12 @@ type TunefindFilter struct {
 }
 
 type TunefindSong struct {
-	Title      string
-	RelUrl     string
-	Artist     string
-	ArtistUrl  string
-	YoutubeUrl string
+	SearchTitle string
+	Title       string
+	RelUrl      string
+	Artist      string
+	ArtistUrl   string
+	YoutubeUrl  string
 }
 
 type TunefindSearcResult struct {
@@ -56,4 +60,40 @@ func TunefindUrlFor(urlType string, queryItem string) string {
 		return fmt.Sprintf("%s/search/site?q=%s", tunefindBaseUrl, queryItem)
 	}
 	return ""
+}
+
+func GoqueryHrefsFromParents(url string, selectors []string) []string {
+	golgoquery.CacheGoquery = true
+	results, err := golgoquery.GoqueryHrefsFromParents(url, selectors)
+	if err != nil {
+		log.Println("[error] fetching some attributes for", url)
+	}
+	return results.Results
+}
+
+func GoqueryTextFromParents(url string, selectors []string) []string {
+	golgoquery.CacheGoquery = true
+	results, err := golgoquery.GoqueryTextFromParents(url, selectors)
+	if err != nil {
+		log.Println("[error] fetching some attributes for", url)
+	}
+	return results.Results
+}
+
+func GoqueryHrefsFrom(url string, selector string) []string {
+	golgoquery.CacheGoquery = true
+	results, err := golgoquery.GoqueryHrefsFrom(url, selector)
+	if err != nil {
+		log.Println("[error] fetching some attributes for", url)
+	}
+	return results.Results
+}
+
+func GoqueryTextFrom(url string, selector string) []string {
+	golgoquery.CacheGoquery = true
+	results, err := golgoquery.GoqueryHrefsFrom(url, selector)
+	if err != nil {
+		log.Println("[error] fetching some attributes for", url)
+	}
+	return results.Results
 }
