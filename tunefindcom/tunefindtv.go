@@ -15,9 +15,8 @@ func IsTvOnTunefind(show string) bool {
 
 func (searchFilter TunefindFilter) TunefindTvEpisodeSongs(relUrl string) (songs []TunefindSong) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
-	goquerySelector := "div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a"
 
-	songResults := GoqueryHrefsFrom(fullUrl, goquerySelector)
+	songResults := GoqueryHrefsFrom(fullUrl, selectorShow["episodeSongs"])
 	songs = make([]TunefindSong, len(songResults))
 
 	songs = searchFilter.SongsResults(songResults, relUrl)
@@ -26,9 +25,8 @@ func (searchFilter TunefindFilter) TunefindTvEpisodeSongs(relUrl string) (songs 
 
 func (searchFilter TunefindFilter) TunefindTvEpisodes(relUrl string) (songs []TunefindSong) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
-	goquerySelector := "div.Tunefind__Content li.MainList__item___fZ13_ h3.EpisodeListItem__title___32XUR a"
 
-	episodeResults := GoqueryHrefsFrom(fullUrl, goquerySelector)
+	episodeResults := GoqueryHrefsFrom(fullUrl, selectorShow["episodes"])
 
 	if searchFilter.EpisodeIndex > len(episodeResults) {
 		log.Printf("[warn] episode#%d not found, it only has %d episodes",
@@ -51,9 +49,8 @@ func (searchFilter TunefindFilter) TunefindTv(relUrl string) (songs []TunefindSo
 	golgoquery.ReloadCache = searchFilter.RefreshCache
 
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, relUrl)
-	goquerySelector := "div.Tunefind__Content ul[aria-labelledby='season-dropdown'] a[role='menuitem']"
 
-	seasonResults := GoqueryHrefsFrom(fullUrl, goquerySelector)
+	seasonResults := GoqueryHrefsFrom(fullUrl, selectorTunefind["show"])
 
 	if searchFilter.SeasonIndex > len(seasonResults) {
 		log.Printf("[warn] season#%d not found, it only has %d seasons",

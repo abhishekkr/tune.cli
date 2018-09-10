@@ -14,44 +14,19 @@ func (song TunefindSong) FirstYoutubeLink() string {
 }
 
 func (song *TunefindSong) TunefindSongsDetailsArtist(fullUrl string) {
-	artistSelector := []string{
-		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
-		"..",
-		"..",
-		"..",
-		"a.Tunefind__Artist",
-	}
-
-	for _, result := range GoqueryTextFromParents(fullUrl, artistSelector) {
+	for _, result := range GoqueryTextFromParents(fullUrl, selectorSongsDetailsArtist(song.RelUrl)) {
 		song.Artist = result
 	}
 }
 
 func (song *TunefindSong) TunefindSongsDetailsArtistLink(fullUrl string) {
-	artistUrlSelector := []string{
-		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
-		"..",
-		"..",
-		"..",
-		"a.Tunefind__Artist",
-	}
-
-	for _, result := range GoqueryHrefsFromParents(fullUrl, artistUrlSelector) {
+	for _, result := range GoqueryHrefsFromParents(fullUrl, selectorSongsDetailsArtistLink(song.RelUrl)) {
 		song.ArtistUrl = result
 	}
 }
 
 func (song *TunefindSong) TunefindSongsDetailsYoutube(fullUrl string) {
-	youtubeUrlSelector := []string{
-		fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl),
-		"..",
-		"..",
-		"..",
-		"..",
-		"a.StoreLinks__youtube___2MHoI",
-	}
-
-	for _, result := range GoqueryHrefsFromParents(fullUrl, youtubeUrlSelector) {
+	for _, result := range GoqueryHrefsFromParents(fullUrl, selectorSongsDetailsYoutube(song.RelUrl)) {
 		song.YoutubeUrl = golhttpclient.UrlRedirectTo(fmt.Sprintf("%s%s", tunefindBaseUrl, result))
 	}
 }
@@ -59,9 +34,7 @@ func (song *TunefindSong) TunefindSongsDetailsYoutube(fullUrl string) {
 func (song *TunefindSong) TunefindSongsDetails(listPageUrl string) {
 	fullUrl := fmt.Sprintf("%s%s", tunefindBaseUrl, listPageUrl)
 
-	goquerySelector := fmt.Sprintf("div.Tunefind__Content div.SongRow__center___1I0Cg h4.SongTitle__heading___3kxXK a[href='%s']", song.RelUrl)
-
-	for _, result := range GoqueryTextFrom(fullUrl, goquerySelector) {
+	for _, result := range GoqueryTextFrom(fullUrl, selectorSongDetails(song.RelUrl)) {
 		song.Title = result
 	}
 

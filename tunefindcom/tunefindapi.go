@@ -10,7 +10,11 @@ import (
 )
 
 var (
-	tunefindBaseUrl = "https://www.tunefind.com"
+	tunefindBaseUrl      = "https://www.tunefind.com"
+	tunefindMovieSubUrl  = "/movies/"
+	tunefindShowSubUrl   = "/show/"
+	tunefindArtistSubUrl = "/artist/"
+	tunefindSearchSubUrl = "/search/site?q="
 )
 
 type TunefindFilter struct {
@@ -51,13 +55,13 @@ func TunefindUrlFor(urlType string, queryItem string) string {
 	queryItem = strings.ToLower(queryItem)
 
 	if urlType == "movie" {
-		return fmt.Sprintf("%s/movies/%s", tunefindBaseUrl, queryItem)
+		return fmt.Sprintf("%s%s%s", tunefindBaseUrl, tunefindMovieSubUrl, queryItem)
 	} else if urlType == "tv" {
-		return fmt.Sprintf("%s/show/%s", tunefindBaseUrl, queryItem)
+		return fmt.Sprintf("%s%s%s", tunefindBaseUrl, tunefindShowSubUrl, queryItem)
 	} else if urlType == "artist" {
-		return fmt.Sprintf("%s/artist/%s", tunefindBaseUrl, queryItem)
+		return fmt.Sprintf("%s%s%s", tunefindBaseUrl, tunefindArtistSubUrl, queryItem)
 	} else if urlType == "search" {
-		return fmt.Sprintf("%s/search/site?q=%s", tunefindBaseUrl, queryItem)
+		return fmt.Sprintf("%s%s%s", tunefindBaseUrl, tunefindSearchSubUrl, queryItem)
 	}
 	return ""
 }

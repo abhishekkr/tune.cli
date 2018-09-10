@@ -15,14 +15,13 @@ func (results *TunefindSearchResults) GoqueryResultsToTunefindSearchResults(sear
 
 func (searchFilter TunefindFilter) TunefindSearch() (songs map[string][]TunefindSong) {
 	var tunefindSearchResults TunefindSearchResults
-	goquerySelector := "div.row.tf-search-results a"
 
 	golgoquery.ReloadCache = searchFilter.RefreshCache
 
 	searchFilter.SearchQuery = strings.Replace(searchFilter.SearchQuery, " ", "+", -1)
 	fullUrl := TunefindUrlFor("search", searchFilter.SearchQuery)
 
-	searchResults := GoqueryHrefsFrom(fullUrl, goquerySelector)
+	searchResults := GoqueryHrefsFrom(fullUrl, selectorTunefind["search"])
 	tunefindSearchResults.GoqueryResultsToTunefindSearchResults(searchResults)
 
 	songs = make(map[string][]TunefindSong, len(tunefindSearchResults.Results))
